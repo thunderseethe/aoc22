@@ -37,10 +37,7 @@ fun top3-calories(calories: list<list<int>>): <console> int {
       else if i > max.c  then max := max(a = max.b, b = max.c, c = i)
       else ()
     }
-    return (x) { 
-      println(show(max.a) ++ " " ++ show(max.b) ++ " " ++ show(max.c)); 
-      max.a + max.b + max.c 
-    }
+    return (x) { max.a + max.b + max.c }
   } 
   calories.map(sum).foreach(yield)
 }
@@ -54,7 +51,6 @@ fun main() {
       Nothing -> throw-exn(Exception("I'm a failure", ExnError))
   val contents = read-text-file(file-path.path)
   val calories = split-up(contents)
-  println(show-list(calories.map(sum), show))
   println("Max calories: " ++ show(max-calories(calories)))
   println("Top 3 calories: " ++ show(top3-calories(calories)))
 }
