@@ -2,27 +2,7 @@ import std/os/env
 import std/os/file
 import std/os/path
 import std/text/parse
-
-fun join<a>(m: maybe<maybe<a>>): maybe<a>
-  match m
-    Just(Just(a)) -> Just(a)
-    _ -> Nothing
-
-fun unwrap<a>(m: maybe<a>): <exn> a
-  match m
-    Just(a) -> a
-    Nothing -> throw("Expected Just value, got nothing")
-
-fun unwrap<a>(p: parse-error<a>): <exn> a
-  match p
-    ParseOk(a, _) -> a
-    ParseError(msg, _) -> throw(msg)
-
-fun lexeme(s: string): parse string
-  whitespace0()
-  val str = pstring(s)
-  whitespace0()
-  str
+import aoc
 
 struct crates
   crates: vector<list<char>>
@@ -63,17 +43,6 @@ fun exec(machine: crates, inss: list<instruction>, move-fn = move-to): exn crate
   }
   Crates(cs)
 }
-
-fun sep-by(p: parser<e, a>, sep: parser<e, b>): <parse|e> list<a> {
-  (fn() {
-    val head = p();
-    val rest = many(fn() val x = sep() in p());
-    Cons(head, rest)
-  }) || (fn() Nil)
-}
-
-fun pchar(c: char): parser<<>, char>
-  fn() char(c)
 
 fun parse-crates(): parse list<list<maybe<char>>> {
   fun parse-a-crate(): parse maybe<char>

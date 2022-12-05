@@ -2,6 +2,7 @@ import std/os/env
 import std/os/file
 import std/os/path
 import std/num/int64
+import aoc
 
 effect double-ended-iterate {
   ctl yield(front: char, back: char): bool
@@ -59,13 +60,6 @@ fun construct-rucksack(s: string): int64 {
     rucksack := rucksack.or(c.bit)
   }
   rucksack
-}
-
-fun chunk<a>(xs: list<a>, n: int): <div> list<list<a>> {
-  val (hd, tail) = xs.split(n);
-  match tail
-    Nil -> Cons(hd, Nil)
-    _ -> Cons(hd, tail.chunk(n))
 }
 
 fun sum-group-badge(rucksacks: list<int64>): <div, exn> int {
