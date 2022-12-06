@@ -1,3 +1,4 @@
+import std/num/int32
 import std/text/parse
 
 
@@ -42,3 +43,23 @@ fun sep-by(p: parser<e, a>, sep: parser<e, b>): <parse|e> list<a> {
 
 fun pchar(c: char): parser<<>, char>
   fn() char(c)
+
+// Custom Datastructures
+struct lower-char-set
+  bits: int32
+
+fun lower-char-set(): lower-char-set
+  Lower-char-set(zero)
+
+fun bit(c: char): int32
+  1.i32.shl(c.int - 'a'.int)
+  
+
+fun contains(set: lower-char-set, c: char): bool 
+  set.bits.and(c.bit) != zero
+
+fun insert(set: lower-char-set, c: char): lower-char-set
+  Lower-char-set(set.bits.or(c.bit))
+  
+fun remove(set: lower-char-set, c: char): lower-char-set
+  Lower-char-set(set.bits.xor(c.bit))

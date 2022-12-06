@@ -5,7 +5,7 @@ import std/text/parse
 import aoc
 
 struct crates
-  crates: vector<list<char>>
+  crates: ref<global, vector<list<char>>>
 
 fun show(c: crates): string {
   var out := ""
@@ -31,17 +31,14 @@ fun move-to(src: list<a>, n:int, dst: list<a>): exn (list<a>, list<a>) {
 }
 
 fun exec(machine: crates, inss: list<instruction>, move-fn = move-to): exn crates {
-  val cs = inss.foldl(machine.crates) fn(cs, ins) { 
-    val (new-src, new-dst): (list<char>, list<char>) = move-fn(cs[ins.src], ins.amount, cs[ins.dst])
-    vector-init(cs.length, fn(i) {
-      if i == ins.src
-        then new-src
-        else if i == ins.dst
-              then new-dst
-              else cs.at(i).default(Nil)
+  inss.foreach(fn(ins) {
+    machine.crates.modify(fn(v: local-var<h, vector<list<char>>>): <local<h>, exn> () {
+      val (new-src, new-dst) = move-fn(v[ins.src], ins.amount, v[ins.dst])
+      v[ins.src] := new-src
+      v[ins.dst] := new-dst
     })
-  }
-  Crates(cs)
+  })
+  machine
 }
 
 fun parse-crates(): parse list<list<maybe<char>>> {
@@ -65,12 +62,12 @@ fun parse-crates(): parse list<list<maybe<char>>> {
   parse-line.sep-by(pchar('\n'))
 }
 
-fun construct-crates(parse: list<list<maybe<char>>>): <exn> crates {
+fun construct-crates(parse: list<list<maybe<char>>>): <exn, alloc<global>> crates {
     val crate-count = parse[0].unwrap.length 
     val crates = vector-init(crate-count, fn(i) {
       parse.filter-map(fn(l) l[i].join)
     })
-    Crates(crates)
+    Crates(ref(crates))
 }
 
 struct instruction
