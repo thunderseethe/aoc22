@@ -19,11 +19,11 @@ fun unwrap<a>(p: parse-error<a>): <exn> a
     ParseError(msg, _) -> throw(msg)
 
 // Lists
-fun chunk<a>(xs: list<a>, n: int): <div> list<list<a>> {
+fun chunk<a>(xs: list<a>, n: int): list<list<a>> {
   val (hd, tail) = xs.split(n);
   match tail
     Nil -> Cons(hd, Nil)
-    _ -> Cons(hd, tail.chunk(n))
+    _ -> Cons(hd, unsafe-decreasing(tail).chunk(n))
 }
 
 alias difflist<a> = (list<a>) -> list<a>
