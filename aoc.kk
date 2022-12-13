@@ -129,6 +129,7 @@ fun pchar(c: char): parser<<>, char>
   fn() char(c)
 
 // Custom Datastructures
+// Bit set for 'a'-'z'
 struct lower-char-set
   bits: int32
 
@@ -138,7 +139,6 @@ fun lower-char-set(): lower-char-set
 fun bit(c: char): int32
   1.i32.shl(c.int - 'a'.int)
   
-
 fun contains(set: lower-char-set, c: char): bool 
   set.bits.and(c.bit) != zero
 
@@ -147,3 +147,56 @@ fun insert(set: lower-char-set, c: char): lower-char-set
   
 fun remove(set: lower-char-set, c: char): lower-char-set
   Lower-char-set(set.bits.xor(c.bit))
+
+// Queue
+struct queue<a>
+  init: list<a>
+  tail: list<a>
+
+fun new(): queue<a> {
+  Queue([], [])  
+}
+
+fun pop-front(q: queue<a>): maybe<(a, queue<a>)> {
+  match q.init {
+    Cons(x, xs) -> Just((x, q(init = xs)))
+    Nil -> match q.tail.reverse {
+      Cons(x, xs) -> Just((x, q(init = xs, tail = [])))
+      Nil -> Nothing
+    }
+  }
+}
+
+fun is-empty(q: queue<a>): bool {
+  match q.init {
+    Cons(_, _) -> False
+    Nil -> match q.tail {
+      Cons(_, _) -> False
+      Nil -> True
+    }
+  }
+}
+fun cons(q: queue<a>, x: a): queue<a> {
+  q(init = Cons(x, q.init))
+}
+fun snoc(q: queue<a>, x: a): queue<a> {
+  q(tail = Cons(x, q.tail))
+}
+fun prepend(q: queue<a>, xs: list<a>): queue<a> {
+ q(init = xs ++ q.init)
+}
+fun append(q: queue<a>, xs: list<a>): queue<a> {
+  q(tail = xs ++ q.tail)
+}
+
+// Pairs
+fun show(pair: (int, int)): string {
+  "(" ++ pair.fst.show ++ ", " ++ pair.snd.show ++ ")"
+}
+
+fun (+)(a: (int, int), b: (int, int)): (int, int) {
+  (a.fst + b.fst, a.snd + b.snd)
+}
+
+fun (==)(a: (int, int), b: (int, int)): bool
+  a.fst == b.fst && a.snd == b.snd
