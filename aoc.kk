@@ -1,7 +1,6 @@
 import std/num/int32
 import std/text/parse
 
-
 // Fail Fastly
 fun join<a>(m: maybe<maybe<a>>): maybe<a>
   match m
@@ -59,7 +58,7 @@ fun sort-by(unsort: list<a>, compare: (a, a) -> order): list<a> {
       xs -> [xs]
   }
 
-  fun merge(xss: list<a>, yss: list<a>, cmp: (a, a) -> order): div list<a> {
+  fun merge(xss: list<a>, yss: list<a>, cmp: (a, a) -> order): list<a> {
     match xss {
       Cons(x, xs) ->
         match yss {
@@ -88,9 +87,9 @@ fun sort-by(unsort: list<a>, compare: (a, a) -> order): list<a> {
 
   // If this diverges I'll end my koka career
   // I'll hang up my fbip forever
-  unsafe-no-div(fn() {
+  unsafe-no-div {
     unsort.sequences(compare).mergeAll(compare)
-  })
+  }
 }
 
 fun dedup-by(lst: list<a>, compare: (a,a) -> order): list<a> {
