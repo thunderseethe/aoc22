@@ -7,23 +7,6 @@ import std/os/path
 import std/text/parse
 import aoc
 
-struct grid<h>
-  width: int
-  height: int
-  data: ref<h, vector<int>>
-
-fun [](^grid: grid<h>, ^point: (int, int)): <read<h>, exn> int 
-  (!grid.data)[point.snd * grid.width + point.fst]
-
-fun [](^grid: grid<h>, ^point: (int, int), value: int): <read<h>, write<h>, exn|e> ()
-  modify(grid.data, fn(data){
-    data[point.snd * grid.width + point.fst] := value
-  })
-
-fun outside(point: (int, int), grid: grid<h>): bool {
-  point.fst < 0 || point.fst >= grid.width || point.snd < 0 || point.snd >= grid.height
-}
-
 fun make-grid(s: string): <alloc<h>, console> (grid<h>, (int, int), (int, int)) {
   var max-width := 0
   var width := 0

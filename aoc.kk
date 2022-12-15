@@ -18,6 +18,16 @@ fun unwrap<a>(p: parse-error<a>): <exn> a
     ParseError(msg, _) -> throw(msg)
 
 // Lists
+fun scanl(xs: list<a>, seed: b, f: (b, a) -> e b): e list<b> {
+  scanl-acc(xs, seed, Nil, f)
+}
+fun scanl-acc(xs: list<a>, seed: b, acc: list<b>, f: (b, a) -> e b): e list<b> {
+  match xs {
+    Nil -> Cons(seed, acc).reverse
+    Cons(x, xx) -> xx.scanl-acc(f(seed, x), Cons(seed, acc), f)
+  }
+}
+
 fun chunk<a>(xs: list<a>, n: int): list<list<a>> {
   val (hd, tail) = xs.split(n);
   match tail
@@ -186,6 +196,43 @@ fun prepend(q: queue<a>, xs: list<a>): queue<a> {
 }
 fun append(q: queue<a>, xs: list<a>): queue<a> {
   q(tail = xs ++ q.tail)
+}
+
+// Grid
+struct grid<h, a>
+  width: int
+  height: int
+  data: ref<h, vector<a>>
+
+fun show-grid(g: grid<h, a>, mk-str: a -> string): <div, read<h> | e> string {
+  (!g.data).list.map(mk-str).chunk(g.width).map(fn(l) l.join).join("\n")
+}
+
+
+fun [](^grid: grid<h, a>, point: point): <read<h>, div, exn> a
+  if point.outside(grid) then throw(point.show ++ " outside grid with dimensions " ++ (grid.width, grid.height).show)
+  (!grid.data)[point.y * grid.width + point.x]
+
+fun [](^grid: grid<h, a>, point: point, value: a): <read<h>, write<h>, exn, div|e> ()
+  if point.outside(grid) then throw(point.show ++ " outside grid with dimensions " ++ (grid.width, grid.height).show)
+  modify(grid.data, fn(data) {
+    val indx = point.y * grid.width + point.x;
+    data[indx] := value
+  })
+
+struct point
+  x: int
+  y: int
+
+fun show(p: point): string
+  "{ x: " ++ p.x.show ++ ", y: " ++ p.y.show ++ " }"
+
+fun (-)(a: point, b: point): point {
+  Point(a.x - b.x, a.y - b.y)
+}
+
+fun outside(point: point, grid: grid<h, a>): bool {
+  point.x < 0 || point.x >= grid.width || point.y < 0 || point.y >= grid.height
 }
 
 // Pairs
